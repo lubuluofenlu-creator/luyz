@@ -1,1 +1,205 @@
-# luyz
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>通缉令 · 卢奕铮</title>
+<style>
+  :root {
+    --bg: #080808;
+    --card: #141414;
+    --text: #c4c4c4;
+    --warn: #ff3b30;
+    --border: #333;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Courier New", Courier, monospace; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(255,59,48,0.08) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px);
+  }
+
+  /* 顶部警报条 */
+  .alert-bar {
+    width: 100%;
+    background: var(--warn);
+    color: #000;
+    font-weight: bold;
+    font-size: 13px;
+    text-align: center;
+    padding: 6px 0;
+    letter-spacing: 2px;
+    animation: flash 1s infinite alternate;
+  }
+  @keyframes flash { 0% { opacity: 0.6; } 100% { opacity: 1; } }
+
+  /* 铁栅栏装饰 */
+  .bars {
+    width: 100%;
+    height: 12px;
+    background: repeating-linear-gradient(90deg, #333, #333 4px, transparent 4px, transparent 12px);
+    border-bottom: 2px solid #111;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+  }
+
+  .container { width: 100%; max-width: 600px; padding: 0 20px; }
+
+  /* 通缉令卡片 */
+  .wanted-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 30px 24px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255,59,48,0.15), inset 0 0 20px rgba(0,0,0,0.8);
+    position: relative;
+    overflow: hidden;
+  }
+  .wanted-card::before {
+    content: "WANTED";
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-size: 100px;
+    font-weight: 900;
+    color: rgba(255,59,48,0.03);
+    letter-spacing: 10px;
+    pointer-events: none;
+  }
+
+  .wanted-card h1 { font-size: 36px; color: #fff; letter-spacing: 4px; margin-bottom: 5px; }
+  .wanted-card .subtitle { font-size: 14px; color: var(--warn); letter-spacing: 2px; margin-bottom: 20px; }
+
+  /* 照片区域 */
+  .mugshot {
+    width: 150px; height: 150px;
+    border-radius: 8px;
+    background: #222;
+    margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #444;
+    overflow: hidden;
+    color: #666; font-size: 12px;
+  }
+  .mugshot img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* 档案信息 */
+  .info-grid { text-align: left; margin-bottom: 24px; font-size: 15px; line-height: 2; }
+  .info-grid span { color: #fff; font-weight: bold; }
+  .info-grid .label { color: #888; display: inline-block; width: 80px; }
+
+  .crime-list { text-align: left; background: rgba(255,59,48,0.05); border-left: 3px solid var(--warn); padding: 15px; margin-bottom: 24px; }
+  .crime-list h3 { color: var(--warn); font-size: 16px; margin-bottom: 10px; }
+  .crime-list p { font-size: 14px; margin-bottom: 6px; color: #aaa; }
+  .crime-list p::before { content: "⚠️ "; }
+
+  /* 互动按钮 */
+  .btn {
+    background: transparent; color: var(--warn); border: 1px solid var(--warn);
+    padding: 12px 24px; font-size: 15px; font-weight: bold; cursor: pointer;
+    border-radius: 4px; transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px;
+    width: 100%;
+  }
+  .btn:hover { background: var(--warn); color: #000; box-shadow: 0 0 20px rgba(255,59,48,0.5); }
+
+  /* 留言板 */
+  .comment-box { margin-top: 40px; background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
+  .comment-box h3 { color: #fff; font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+  .comment-form input, .comment-form textarea {
+    width: 100%; background: #0a0a0a; border: 1px solid #333; color: #ccc;
+    padding: 10px; border-radius: 4px; margin-bottom: 10px; outline: none; font-size: 14px;
+  }
+  .comment-form input:focus, .comment-form textarea:focus { border-color: var(--warn); }
+  .comment-item { border-bottom: 1px dashed #333; padding: 12px 0; font-size: 14px; }
+  .comment-item .name { color: var(--warn); font-weight: bold; }
+  .comment-item .time { color: #555; font-size: 12px; margin-left: 10px; }
+  .comment-item .text { color: #aaa; margin-top: 4px; }
+  .no-comment { color: #555; text-align: center; font-size: 13px; padding: 10px; }
+
+  .footer { text-align: center; padding: 30px; font-size: 12px; color: #444; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="alert-bar">⚠️ 系统警报：检测到黄山实验小学六年级危险分子 ⚠️</div>
+<div class="bars"></div>
+
+<div class="container">
+  <!-- 通缉令 -->
+  <div class="wanted-card">
+    <h1>卢奕铮</h1>
+    <div class="subtitle">【 档案编号：L-0612 】</div>
+
+    <div class="mugshot">
+      <!-- 如果有照片：把下面的文字换成 <img src="photo.jpg" alt="卢奕铮"> -->
+      <span>[ 照片未录入 ]<br>请上传 photo.jpg</span>
+    </div>
+
+    <div class="info-grid">
+      <div><span class="label">姓名：</span><span>卢奕铮</span></div>
+      <div><span class="label">别名：</span><span>黄山实验小学六年级在逃学子</span></div>
+      <div><span class="label">特征：</span><span>戴眼镜，爱穿条纹衫，爱吃零食</span></div>
+      <div><span class="label">状态：</span><span style="color:var(--warn);">监控中（禁足家中）</span></div>
+    </div>
+
+    <div class="crime-list">
+      <h3>【 主要罪状 】</h3>
+      <p>涉嫌在课堂上偷吃零食，同桌举报。</p>
+      <p>涉嫌在语文课看漫画，被老师当场抓获。</p>
+      <p>涉嫌逃避周末作业，企图蒙混过关。</p>
+      <p>涉嫌偷喝冰箱里的饮料，人赃并获。</p>
+    </div>
+
+    <button class="btn" onclick="attemptEscape()">尝试越狱</button>
+  </div>
+
+  <!-- 留言板 -->
+  <div class="comment-box">
+    <h3>📝 探监留言簿</h3>
+    <form class="comment-form" id="commentForm">
+      <input type="text" id="commentName" placeholder="探监人姓名（选填）" maxlength="20">
+      <textarea id="commentText" placeholder="写下一句话，鼓励他好好改造..." maxlength="100" required></textarea>
+      <button type="submit" class="btn" style="padding: 8px; font-size: 13px;">提交留言</button>
+    </form>
+    <div id="commentList"><div class="no-comment">暂无探监记录，快来留下第一条吧！</div></div>
+  </div>
+</div>
+
+<div class="footer">© 2025 卢奕铮 · 个人档案 · 黄山实验小学六年级</div>
+
+<script>
+  // 越狱互动
+  function attemptEscape() {
+    const res = confirm('警告！你确定要尝试越狱吗？');
+    if (res) {
+      const msgs = [
+        '越狱失败！被老师堵在了走廊。',
+        '越狱失败！被同桌用作业本拍晕。',
+        '越狱失败！妈妈在门口等着呢。',
+        '越狱失败！零食掉地上了，回去捡一下。',
+        '越狱失败！监控探头发现你了。'
+      ];
+      alert(msgs[Math.floor(Math.random() * msgs.length)]);
+    } else {
+      alert('坦白从宽，抗拒从严。回去写作业吧！');
+    }
+  }
+
+  // 留言板
+  const STORAGE_KEY = 'luyizheng_comments';
+  let comments = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const list = document.getElementById('commentList');
+
+  function renderComments() {
+    if (!comments.length) return list.innerHTML = '<div class="no-comment">暂无探监记录，快来留下第一条吧！</div>';
+    list.innerHTML = comments.map(c => `
+      <div class="comment-item">
+        <div><span class="name">${c.name}</span><span class="time">${c.time}</span></di# luyz
